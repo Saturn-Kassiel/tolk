@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
@@ -91,7 +91,7 @@ body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-b
 .empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px;line-height:1.7;}
 
 /* fab */
-.fab-area{padding:16px 16px calc(16px + var(--safe-bottom));display:flex;flex-direction:column;flex-shrink:0;background:var(--bg);align-items:center;justify-content:center;}
+.fab-area{padding:4px 16px calc(6px + var(--safe-bottom));display:flex;flex-direction:column;flex-shrink:0;background:var(--bg);align-items:center;justify-content:center;}
 .fab{width:68px;height:68px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,#2D9E6B,#1A7A4E);box-shadow:0 0 0 8px rgba(45,158,107,0.15),0 8px 28px rgba(45,158,107,0.45);transition:transform .15s,box-shadow .15s;flex-shrink:0;}
 .fab:active{transform:scale(.93);box-shadow:0 0 0 4px rgba(45,158,107,0.1),0 4px 14px rgba(45,158,107,0.35);}
 .fab-icon-btn{display:none;}
@@ -344,7 +344,7 @@ body.light .save-prof-btn{box-shadow:0 4px 20px rgba(45,158,107,.25);}
 .scan-result.show{transform:translateY(0);pointer-events:all;}
 
 /* toast */
-#toast{position:absolute;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(30,36,51,0.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:.5px solid var(--border2);border-radius:14px;padding:10px 20px;font-size:13px;white-space:nowrap;z-index:200;transition:opacity .3s;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.4);}
+#toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(30,36,51,0.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:.5px solid var(--border2);border-radius:14px;padding:10px 20px;font-size:13px;white-space:nowrap;z-index:9999;transition:opacity .3s;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.4);}
 #toast.hidden{opacity:0;pointer-events:none;}
 
 /* picker */
@@ -727,6 +727,7 @@ function closeKcalInfo() {
 }
 
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -784,7 +785,6 @@ function closeKcalInfo() {
 
   <div class="scroll" id="askeza-scroll">
 
-    <!-- ГЛАВНЫЙ ПОДЭКРАН -->
     <div class="askeza-sub-screen active" id="asc-main">
 
       <!-- нет аскез -->
@@ -861,9 +861,8 @@ function closeKcalInfo() {
 
       </div><!-- end asc-has -->
 
-    </div>
+    </div><!-- end asc-main -->
 
-  </div><!-- end scroll -->    <!-- КОМПРОМИСС -->
     <div class="askeza-sub-screen" id="asc-compromise" style="padding:16px;">
       <button class="back-btn" onclick="ascShowSub('main')" style="margin-bottom:14px;"><svg width="18" height="18"><use href="#i-back"/></svg>Назад</button>
       <div class="askeza-sub-title">Компромисс</div>
@@ -954,6 +953,8 @@ function closeKcalInfo() {
     <div id="asc-archive-list"></div>
   </div>
 
+  
+
   </div><!-- end scroll -->
 
   <div class="nav">
@@ -1042,7 +1043,7 @@ function closeKcalInfo() {
     </div>
   </div>
   <div class="fab-area" style="flex-direction:column;gap:0;justify-content:center;">
-    <div id="fab-hint" style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:17px;padding:0 32px;line-height:1.5;">Назови продукт/блюдо/напиток, его вес/объём</div>
+    <div id="fab-hint" style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:6px;padding:0 32px;line-height:1.5;">Назови продукт/блюдо/напиток, его вес/объём</div>
     <div style="display:flex;align-items:center;justify-content:center;gap:16px;">
       <button onclick="openManualDrawer()" style="width:44px;height:44px;border-radius:50%;border:.5px solid var(--border2);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);" title="Ввести вручную"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
       <button class="fab" onclick="startListening()"><svg width="28" height="28"><use href="#i-mic"/></svg></button>
@@ -1081,6 +1082,18 @@ function closeKcalInfo() {
   </button>
 </div>
 
+
+<!-- ═══ DRAWER: ВЫБОР ПЕРИОДА ОТЧЁТА ═══ -->
+<div class="drawer-bg hidden" id="report-period-bg" onclick="closeReportSheet()"></div>
+<div class="drawer hidden" id="report-period-drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-title">Отчёт за период</div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px;">
+    <button onclick="generateReport('today')" style="width:100%;height:54px;border-radius:14px;border:1px solid var(--border2);background:var(--card2);cursor:pointer;font-family:var(--font-head);font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:14px;padding:0 18px;"><span style="font-size:22px;">📋</span><div style="text-align:left;"><div>Сегодня</div><div style="font-size:11px;font-weight:400;color:var(--muted);margin-top:1px;">Приёмы пищи и итог дня</div></div></button>
+    <button onclick="generateReport('week')" style="width:100%;height:54px;border-radius:14px;border:1px solid var(--border2);background:var(--card2);cursor:pointer;font-family:var(--font-head);font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:14px;padding:0 18px;"><span style="font-size:22px;">📊</span><div style="text-align:left;"><div>Последние 7 дней</div><div style="font-size:11px;font-weight:400;color:var(--muted);margin-top:1px;">График, среднее, топ продуктов</div></div></button>
+    <button onclick="generateReport('month')" style="width:100%;height:54px;border-radius:14px;border:1px solid var(--border2);background:var(--card2);cursor:pointer;font-family:var(--font-head);font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:14px;padding:0 18px;"><span style="font-size:22px;">📅</span><div style="text-align:left;"><div>Последние 30 дней</div><div style="font-size:11px;font-weight:400;color:var(--muted);margin-top:1px;">Итоги по дням, анализ, топы</div></div></button>
+  </div>
+</div>
 <!-- ═══ УВЕДОМЛЕНИЕ: ОБОГАЩЕНИЕ ═══ -->
 <div id="enrich-banner" style="display:none;position:absolute;bottom:calc(80px + var(--safe-bottom));left:12px;right:12px;background:var(--card);border:.5px solid var(--border2);border-radius:16px;padding:14px 16px;z-index:200;box-shadow:0 4px 24px rgba(0,0,0,.15);">
   <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;" id="enrich-banner-text">Найдены записи без КБЖУ</div>
@@ -1097,7 +1110,7 @@ function closeKcalInfo() {
   <div class="listen-text">Слушаю...</div>
   <div class="transcript" id="transcript">Говорите что ели</div>
   <div class="listen-hint">Например: «Гречка 150г, куриная грудка 200г»</div>
-  <button class="cancel-btn" onclick="stopListening()"><svg width="14" height="14" style="margin-right:4px"><use href="#i-x"/></svg>Отмена</button>
+  <button class="cancel-btn" onclick="stopListening();"><svg width="14" height="14" style="margin-right:4px"><use href="#i-x"/></svg>Отмена</button>
 </div>
 
 <!-- ═══ SCREEN: PREVIEW ═══ -->
@@ -1236,6 +1249,7 @@ function closeKcalInfo() {
       <div class="notif-row2" style="padding-top:10px;">
         <div class="notif-info">
           <div class="notif-title">Виджет алкоголя на главной</div>
+          <div class="notif-sub">Появляется автоматически при записи алкогольного напитка</div>
         </div>
         <button id="nb-showalcohol" onclick="tapShowAlcohol()" class="notif-toggle"><span class="notif-toggle-thumb" id="nb-thumb-showalcohol"></span></button>
       </div>
@@ -1441,7 +1455,7 @@ function closeKcalInfo() {
       <div style="font-size:11px;color:var(--muted);margin-top:6px">Без ключа — встроенный парсер. С ключом — умный AI-разбор.</div>
     </div>
     <button class="save-prof-btn" onclick="saveProfile()"><svg width="18" height="18"><use href="#i-save"/></svg>Сохранить профиль</button>
-    <button onclick="generateReport()" style="width:100%;height:48px;border-radius:14px;border:1px solid var(--border2);background:var(--card);cursor:pointer;font-family:var(--font-head);font-size:13px;font-weight:600;color:var(--green);margin-bottom:calc(8px + var(--safe-bottom));display:flex;align-items:center;justify-content:center;gap:10px;"><svg width="18" height="18"><use href="#i-download"/></svg>Скачать отчёт PDF</button>
+    <button onclick="openReportSheet()" style="width:100%;height:48px;border-radius:14px;border:1px solid var(--border2);background:var(--card);cursor:pointer;font-family:var(--font-head);font-size:13px;font-weight:600;color:var(--green);margin-bottom:calc(8px + var(--safe-bottom));display:flex;align-items:center;justify-content:center;gap:10px;"><svg width="18" height="18"><use href="#i-download"/></svg>Скачать отчёт PDF</button>
   </div>
   <div class="nav">
     <button class="nav-btn" onclick="showScreen('home')"><svg class="ico" width="22" height="22"><use href="#i-home"/></svg><span class="nav-lbl">Сегодня</span></button>
@@ -1753,7 +1767,7 @@ function loadState() {
       if (d.showAlcohol !== undefined) S.showAlcohol = d.showAlcohol;
     }
   } catch(e) { console.warn('loadState error', e); }
-  S.meals = S.meals.filter(m => m.date === todayStr());
+  S.meals = S.meals.filter(m => !m.date || m.date === todayStr());
   calcLimits();
 }
 
@@ -1842,14 +1856,17 @@ function recalc() {
   sb('sp-c','sp-cl','bc',t.c,l.c);
 
   const ml = document.getElementById('meal-list');
+  const hint = document.getElementById('fab-hint');
   if (!meals.length) {
     ml.innerHTML = `<div class="empty-state"></div>`;
+    if (hint) hint.style.display = 'block';
     if (!isActiveDateToday()) {
-      renderWater(); // пилюля воды = 0
+      renderWater();
       document.getElementById('alcohol-widget').style.display = 'none';
     }
     return;
   }
+  if (hint) hint.style.display = 'none';
   if (isActiveDateToday()) { renderWater(); renderAlcohol(); }
   else {
     renderWater(); // обновляет пилюлю воды в КБЖУ, но скрывает виджет
@@ -1891,9 +1908,11 @@ function recalc() {
 // VOICE
 // ════════════════════════════════════
 let recog = null;
+let _recogStopping = false;
 function startListening() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { showManual(); return; }
+  _recogStopping = false;
   document.getElementById('overlay-listen').classList.remove('hidden');
   document.getElementById('transcript').textContent = 'Говорите...';
   recog = new SR(); recog.lang = 'ru-RU'; recog.interimResults = true;
@@ -1901,22 +1920,25 @@ function startListening() {
     let f='',tmp='';
     for (const r of e.results) { if(r.isFinal) f+=r[0].transcript; else tmp+=r[0].transcript; }
     document.getElementById('transcript').textContent = f||tmp||'Говорите...';
-    if (f) setTimeout(() => processVoice(f), 300);
+    if (f) { stopListening(); setTimeout(() => processVoice(f), 300); }
   };
   recog.onerror = () => { stopListening(); showManual(); };
   recog.onend = () => {
+    if (_recogStopping) return;
     const t = document.getElementById('transcript').textContent;
+    stopListening();
     if (t && t !== 'Говорите...' && t !== 'Говорите что ели') processVoice(t);
   };
   recog.start();
 }
 function stopListening() {
+  if (_recogStopping) return;
+  _recogStopping = true;
   if (recog) { try { recog.stop(); } catch(e){} recog = null; }
   document.getElementById('overlay-listen').classList.add('hidden');
 }
 function showManual() {
-  showToast('Голос недоступен — введи вручную');
-  showScreen('search');
+  openManualDrawer();
 }
 async function processVoice(text) {
   stopListening();
@@ -2076,6 +2098,7 @@ function removePreviewItem(i){
   showPreview(S.currentParsed);
 }
 function saveMeal(){
+  stopListening(); // на всякий случай, если recog ещё активен
   if(!S.currentParsed||!S.currentParsed.items.length)return;
   const activeDate = getActiveDate();
   const isFuture = activeDate > todayStr();
@@ -2486,7 +2509,8 @@ let histDate = todayStr();
 function persistHistory(){
   try{
     let all={};const s=localStorage.getItem('nv_hist');if(s)all=JSON.parse(s);
-    if(S.meals.length)all[todayStr()]=S.meals;
+    const todayMeals = S.meals.filter(m => !m.date || m.date === todayStr());
+    if(todayMeals.length)all[todayStr()]=todayMeals;
     const cut=new Date();cut.setDate(cut.getDate()-90);
     Object.keys(all).forEach(k=>{if(new Date(k)<cut)delete all[k];});
     try{localStorage.setItem('nv_hist',JSON.stringify(all));}catch(e){}
@@ -2511,7 +2535,7 @@ function renderCal(yr,mo){
   const today=todayStr();
   let allDates=new Set();
   try{const s=localStorage.getItem('nv_hist');if(s)Object.keys(JSON.parse(s)).forEach(k=>allDates.add(k));}catch(e){}
-  S.meals.forEach(m=>allDates.add(m.date));
+  S.meals.forEach(m => { if(m.date) allDates.add(m.date); else allDates.add(todayStr()); });
   let dow=new Date(yr,mo,1).getDay();dow=dow===0?6:dow-1;
   const dim=new Date(yr,mo+1,0).getDate();
   let html='';
@@ -2824,7 +2848,7 @@ function saveProfile(){
   S.apiKey=document.getElementById('f-apikey').value.trim();
   const fc=document.getElementById('f-kcal-custom');
   if(fc)S.kcalCustom=parseInt(fc.value)||0;
-  calcLimits();saveState();recalc();updateProfileUI();showToast('Профиль сохранён');showScreen('home');
+  calcLimits();saveState();recalc();updateProfileUI();showToast('Профиль сохранён');setTimeout(()=>showScreen('home'),300);
 }
 function loadProfileUI(){
   document.getElementById('f-weight').value=S.profile.weight||'';
@@ -3032,7 +3056,8 @@ function addSwipeDown(el, onClose) {
 function initSwipeDown() {
   const wrap = (el, fn) => () => { if(el) el.style.transform = ''; fn(); };
 
-  addSwipeDown(document.getElementById('manual-drawer'),   wrap(document.getElementById('manual-drawer'),   closeManualDrawer));
+  addSwipeDown(document.getElementById('manual-drawer'),        wrap(document.getElementById('manual-drawer'),        closeManualDrawer));
+  addSwipeDown(document.getElementById('report-period-drawer'), wrap(document.getElementById('report-period-drawer'), closeReportSheet));
   addSwipeDown(document.getElementById('drawer'),          wrap(document.getElementById('drawer'),          closeDrawer));
   addSwipeDown(document.getElementById('kcal-info-sheet'), wrap(document.getElementById('kcal-info-sheet'), closeKcalInfo));
   const sr = document.getElementById('scan-result');
@@ -3506,6 +3531,7 @@ function commitWater() {
   const meal = {
     type: 'Напитки',
     time: hh + ':' + mm,
+    date: todayStr(),
     items: [{
       name: 'вода',
       weight: ml,
@@ -4571,206 +4597,325 @@ function closeKcalInfo() {
 // ════════════════════════════════════
 // PDF REPORT
 // ════════════════════════════════════
-function generateReport() {
+function openReportSheet() {
+  document.getElementById('report-period-bg').classList.remove('hidden');
+  document.getElementById('report-period-drawer').classList.remove('hidden');
+}
+function closeReportSheet() {
+  document.getElementById('report-period-bg').classList.add('hidden');
+  document.getElementById('report-period-drawer').classList.add('hidden');
+}
+
+async function generateReport(period) {
+  closeReportSheet();
+  showToast('Формирую отчёт...');
+
   const today = new Date();
   const todayKey = todayStr();
-  const todayLabel = today.toLocaleDateString('ru-RU', {day:'numeric',month:'long',year:'numeric'});
 
   let hist = {};
   try { const s = localStorage.getItem('nv_hist'); if(s) hist = JSON.parse(s); } catch(e) {}
   hist[todayKey] = S.meals;
 
-  // Данные за сегодня — для шапки
-  const todayMeals = hist[todayKey] || [];
-  const todayTot = {kcal:0,p:0,f:0,c:0};
-  todayMeals.forEach(m => m.items.forEach(i => { todayTot.kcal+=i.kcal; todayTot.p+=i.p; todayTot.f+=i.f; todayTot.c+=i.c; }));
-
-  // Данные за неделю — для карточек и графика
-  const tot = {kcal:0,p:0,f:0,c:0};
-  const weekStart = new Date(today); weekStart.setDate(today.getDate()-6);
-  let daysWithData = 0;
-  Object.entries(hist).forEach(([ds, meals]) => {
-    if(new Date(ds+'T12:00:00') < weekStart) return;
-    const dayKcal = (meals||[]).reduce((s,m)=>s+m.items.reduce((ss,i)=>ss+i.kcal,0),0);
-    if(dayKcal > 0) daysWithData++;
-    (meals||[]).forEach(m => m.items.forEach(i => { tot.kcal+=i.kcal; tot.p+=i.p; tot.f+=i.f; tot.c+=i.c; }));
-  });
-  const activeDays = Math.max(daysWithData, 1);
-  const avg = {
-    kcal: Math.round(tot.kcal / activeDays),
-    p: Math.round(tot.p / activeDays),
-    f: Math.round(tot.f / activeDays),
-    c: Math.round(tot.c / activeDays),
-  };
+  let days = [];
+  let periodLabel = '';
+  if (period === 'today') {
+    days = [todayKey];
+    periodLabel = 'Сегодня, ' + today.toLocaleDateString('ru-RU', {day:'numeric',month:'long',year:'numeric'});
+  } else if (period === 'week') {
+    for (let i = 6; i >= 0; i--) { const d = new Date(today); d.setDate(today.getDate()-i); days.push(dateToStr(d)); }
+    const from = new Date(today); from.setDate(today.getDate()-6);
+    periodLabel = from.toLocaleDateString('ru-RU',{day:'numeric',month:'long'}) + ' \u2014 ' + today.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+  } else {
+    for (let i = 29; i >= 0; i--) { const d = new Date(today); d.setDate(today.getDate()-i); days.push(dateToStr(d)); }
+    const from = new Date(today); from.setDate(today.getDate()-29);
+    periodLabel = from.toLocaleDateString('ru-RU',{day:'numeric',month:'long'}) + ' \u2014 ' + today.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+  }
 
   const lim = S.limits;
-  const pct = lim.kcal>0 ? Math.round(todayTot.kcal/lim.kcal*100) : 0;
-  const pPct = Math.min(100, lim.p>0 ? Math.round(todayTot.p/lim.p*100) : 0);
-  const fPct = Math.min(100, lim.f>0 ? Math.round(todayTot.f/lim.f*100) : 0);
-  const cPct = Math.min(100, lim.c>0 ? Math.round(todayTot.c/lim.c*100) : 0);
+  const userName = (S.profile && S.profile.name) ? S.profile.name : '';
+  const waterNormDay = Math.round((S.profile && S.profile.weight ? S.profile.weight : 70) * 33);
 
-  const weekDays = [];
-  for (let i=6; i>=0; i--) {
-    const d = new Date(today); d.setDate(today.getDate()-i);
-    const ds = dateToStr(d);
-    const meals = hist[ds]||[];
-    const kcal = meals.reduce((s,m)=>s+m.items.reduce((ss,it)=>ss+it.kcal,0),0);
-    weekDays.push({label:d.toLocaleDateString('ru-RU',{weekday:'short'}),kcal,isToday:i===0,_ds:ds});
-  }
-  const maxK = Math.max(...weekDays.map(d=>d.kcal), lim.kcal||1, 1);
-
-  const cutoff = new Date(today); cutoff.setDate(today.getDate()-30);
-  const DRINK_KEYS = ['кофе','чай','сок','вода','молоко','кефир','компот','кисель','квас','капучино','латте','айран',
-    'какао','коктейль','смузи','напиток','морс','ряженка','простокваша','снежок','тан','кумыс','сыворотка',
-    'лимонад','газировка','минералка','энергетик','пиво','вино','шампанское','коньяк','водка','сидр','виски'];
-  const isDrink = n => DRINK_KEYS.some(k => n.includes(k));
-  const prodCounts={}, dishCounts={}, drinkCounts={};
-  Object.entries(hist).forEach(([ds,meals]) => {
-    if (new Date(ds) < cutoff) return;
-    (meals||[]).forEach(m=>(m.items||[]).forEach(it=>{
-      const n = it.name.toLowerCase().trim();
-      if(isDrink(n)){
-        drinkCounts[n]=(drinkCounts[n]||0)+1;
-      } else if(it.source==='ai'){
-        dishCounts[n]=(dishCounts[n]||0)+1;
-      } else {
-        if(DB[n]) prodCounts[n]=(prodCounts[n]||0)+1;
-        else dishCounts[n]=(dishCounts[n]||0)+1;
-      }
+  const dayData = days.map(ds => {
+    const meals = hist[ds] || [];
+    const tot = {kcal:0,p:0,f:0,c:0,water:0};
+    meals.forEach(m => m.items.forEach(i => {
+      tot.kcal+=i.kcal; tot.p+=i.p; tot.f+=i.f; tot.c+=i.c;
+      const nm=(i.name||'').toLowerCase();
+      if(['вода','чай','кофе','сок','молоко','кефир','компот','капучино','латте','газировка','минералка','напиток','морс','смузи'].some(k=>nm.includes(k))) tot.water+=i.weight||0;
     }));
-  });
-  const prods=Object.entries(prodCounts).map(([name,cnt])=>({name,cnt})).sort((a,b)=>b.cnt-a.cnt);
-  const dishs=Object.entries(dishCounts).map(([name,cnt])=>({name,cnt})).sort((a,b)=>b.cnt-a.cnt);
-  const drinks=Object.entries(drinkCounts).map(([name,cnt])=>({name,cnt})).sort((a,b)=>b.cnt-a.cnt);
-
-  const mc = i => '#6B7280';
-  const md = i => String(i+1);
-  const ti = (it,i) => '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #E5E7EB;"><div style="font-family:Nunito,sans-serif;font-size:13px;font-weight:800;width:22px;color:'+mc(i)+';flex-shrink:0;">'+md(i)+'</div><div style="flex:1;font-size:12px;color:#1F2937;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+it.name.charAt(0).toUpperCase()+it.name.slice(1)+'</div><div style="font-size:11px;color:#9CA3AF;flex-shrink:0;">'+it.cnt+'×</div></div>';
-  const emp = '<div style="font-size:12px;color:#9CA3AF;padding:12px 0;text-align:center;">Нет данных</div>';
-
-  const allWeekMeals = [];
-  weekDays.forEach(wd => {
-    const ds = wd._ds;
-    (hist[ds]||[]).forEach(m => allWeekMeals.push({...m, _date: wd.label}));
+    const ws=()=>{try{return parseInt(localStorage.getItem('nv_water_'+ds)||'0');}catch(e){return 0;}};
+    tot.water=Math.max(tot.water,ws());
+    return {ds, meals, ...tot, hasMeals:meals.length>0};
   });
 
-  const mealRows = allWeekMeals.length ? allWeekMeals.map(m=>{
-    const mt = m.items.reduce((s,i)=>({kcal:s.kcal+i.kcal,p:s.p+i.p,f:s.f+i.f,c:s.c+i.c}),{kcal:0,p:0,f:0,c:0});
-    const names = m.items.map(i=>i.name.charAt(0).toUpperCase()+i.name.slice(1)+(i.weight?' '+Math.round(i.weight)+'г':'')).join(', ');
-    return '<tr><td style="padding:9px 0;font-size:13px;color:#1F2937;border-bottom:1px solid #E5E7EB;">'+names+'</td><td style="padding:9px 0;font-size:12px;color:#6B7280;text-align:right;border-bottom:1px solid #E5E7EB;white-space:nowrap;">'+(m._date||'')+(m.time?' · '+m.time:'')+'</td><td style="padding:9px 0;font-size:11px;color:#6B7280;text-align:right;border-bottom:1px solid #E5E7EB;white-space:nowrap;">'+Math.round(mt.p)+'/'+Math.round(mt.f)+'/'+Math.round(mt.c)+'</td><td style="padding:9px 0;font-family:Nunito,sans-serif;font-weight:700;font-size:14px;color:#2D9E6B;text-align:right;border-bottom:1px solid #E5E7EB;">'+Math.round(mt.kcal)+'</td></tr>';
-  }).join('') : '<tr><td colspan="4" style="padding:16px 0;text-align:center;color:#9CA3AF;font-size:13px;">Записей нет</td></tr>';
+  const daysWithData = dayData.filter(d=>d.hasMeals);
+  const nDays = Math.max(daysWithData.length,1);
+  const avg = {
+    kcal: Math.round(daysWithData.reduce((s,d)=>s+d.kcal,0)/nDays),
+    p:    Math.round(daysWithData.reduce((s,d)=>s+d.p,0)/nDays),
+    f:    Math.round(daysWithData.reduce((s,d)=>s+d.f,0)/nDays),
+    c:    Math.round(daysWithData.reduce((s,d)=>s+d.c,0)/nDays),
+    water:Math.round(daysWithData.reduce((s,d)=>s+d.water,0)/nDays),
+  };
 
-  const chartBars = weekDays.map(d=>{
-    const h = d.kcal===0 ? 0 : Math.max(4, Math.round(d.kcal/maxK*100));
-    const color = d.kcal===0?'#E5E7EB':(lim.kcal>0 && d.kcal>lim.kcal*1.05)?'#FF6B6B':'#2D9E6B';
-    return '<div style="flex:1;display:flex;align-items:flex-end;height:100%;"><div style="width:100%;height:'+h+'%;background:'+color+';border-radius:4px 4px 0 0;min-height:'+(d.kcal>0?'4':'0')+'px;"></div></div>';
-  }).join('');
-  const chartLabels = weekDays.map(d=>{
-    return '<div style="flex:1;text-align:center;font-size:9px;color:#6B7280;padding-top:4px;">'+d.label+'</div>';
-  }).join('');
+  const DRINK_KEYS=['кофе','чай','сок','вода','молоко','кефир','компот','кисель','квас','капучино','латте','айран','какао','смузи','напиток','морс','ряженка','лимонад','газировка','минералка','энергетик','пиво','вино','шампанское','коньяк','водка','сидр','виски'];
+  const isDrink=n=>DRINK_KEYS.some(k=>n.includes(k));
+  const prodC={},dishC={},drinkC={};
+  daysWithData.forEach(({meals})=>(meals||[]).forEach(m=>(m.items||[]).forEach(it=>{
+    const n2=(it.name||'').toLowerCase().trim();
+    if(isDrink(n2)) drinkC[n2]=(drinkC[n2]||0)+1;
+    else if(it.source==='ai') dishC[n2]=(dishC[n2]||0)+1;
+    else { if(DB[n2]) prodC[n2]=(prodC[n2]||0)+1; else dishC[n2]=(dishC[n2]||0)+1; }
+  })));
+  const topProds  = Object.entries(prodC).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const topDishs  = Object.entries(dishC).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const topDrinks = Object.entries(drinkC).sort((a,b)=>b[1]-a[1]).slice(0,10);
 
-  const LOGO = APP_LOGO;
+  let summary = '';
+  if (S.apiKey && period !== 'today') {
+    try {
+      const prompt = `Ты нутрициолог-аналитик. Напиши краткое нейтральное резюме питания строго в три блока:\n\n1. ОБЩЕЕ: период ${periodLabel}, дней с данными ${daysWithData.length}, средняя калорийность ${avg.kcal} ккал (норма ${lim.kcal} ккал, ${lim.kcal>0?Math.round(avg.kcal/lim.kcal*100):0}%).\n2. ПОКАЗАТЕЛИ: Белки ${avg.p}г (норма ${lim.p}г, ${lim.p>0?Math.round(avg.p/lim.p*100):0}%). Жиры ${avg.f}г (норма ${lim.f}г, ${lim.f>0?Math.round(avg.f/lim.f*100):0}%). Углеводы ${avg.c}г (норма ${lim.c}г, ${lim.c>0?Math.round(avg.c/lim.c*100):0}%). Вода ${avg.water}мл (норма ${waterNormDay}мл).\n3. НАБЛЮДЕНИЯ: ${dayData.map(d=>d.ds.slice(5)+' '+Math.round(d.kcal)+'ккал').join(', ')}.\n\nПиши только факты. Без восклицательных знаков. Без мотивации. Максимум 6 предложений.`;
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${S.apiKey}`},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],max_tokens:400})});
+      const data = await res.json();
+      summary = data?.choices?.[0]?.message?.content || '';
+    } catch(e) { summary = ''; }
+  }
 
-  const statCards = [['Калории',Math.round(tot.kcal),'ккал','из '+lim.kcal,'#2D9E6B'],['Белки',Math.round(tot.p),'г','из '+lim.p+'г','#60A5FA'],['Жиры',Math.round(tot.f),'г','из '+lim.f+'г','#FBBF24'],['Углеводы',Math.round(tot.c),'г','из '+lim.c+'г','#FF6B6B']]
-    .map(([l,v,u,n,c])=>'<div style="background:#F7F9FC;border-radius:14px;padding:12px 14px;border:1px solid #E5E7EB;"><div style="font-size:10px;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">'+l+'</div><div style="font-family:Nunito,sans-serif;font-size:18px;font-weight:800;color:'+c+';line-height:1.1;">'+v+' <span style="font-size:11px;font-weight:400;color:#9CA3AF;">'+u+'</span></div><div style="font-size:10px;color:#9CA3AF;margin-top:2px;">'+n+'</div></div>').join('');
+  // ═══ Хелперы цвета ═══
+  const pctOf = (v,n) => n>0?Math.round(v/n*100):0;
+  const pctColor = (pct) => pct>110?'#EF4444':pct<70?'#F59E0B':'#2D9E6B';
+  const pctBg    = (pct) => pct>110?'#FEF2F2':pct<70?'#FFFBEB':'#F0FDF4';
+  const statCell = (label,val,unit,norm,color) => {
+    const pct = pctOf(val,norm);
+    const c = pctColor(pct);
+    return `<div class="stat-cell">
+      <div class="stat-lbl">${label}</div>
+      <div class="stat-val" style="color:${color||c}">${val}<span class="stat-unit">${unit}</span></div>
+      <div class="stat-pct" style="color:${c};background:${pctBg(pct)}">${pct}%</div>
+    </div>`;
+  };
 
-  const html = '<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>ТОЛК — Отчёт</title>'
-    +'<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">'
-    +'<style>*{box-sizing:border-box;margin:0;padding:0;}html,body{min-height:100%;}body{font-family:Inter,sans-serif;background:#F7F9FC;padding:24px 0 48px;max-width:480px;margin:0 auto;}.page{max-width:480px;margin:0 auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 8px 48px rgba(0,0,0,.08);}.dl{max-width:480px;margin:0 auto 12px;display:flex;justify-content:space-between;align-items:center;padding:0 8px;}.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:14px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;background:#2D9E6B;color:#fff;box-shadow:0 4px 16px rgba(45,158,107,.3);}.btn-back{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:14px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:1px solid #E5E7EB;background:#fff;color:#6B7280;}@media print{body{background:#fff;padding:0;max-width:none;}.page{box-shadow:none;border-radius:0;max-width:100%;}.dl{display:none;}}</style></head><body>'
-    +'<div class="dl"><button class="btn-back" onclick="window.close()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Назад</button><button class="btn" onclick="window.print()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Скачать PDF</button></div>'
-    +'<div class="page">'
-    // header
-    +'<div style="background:linear-gradient(135deg,#2D9E6B,#1A7A4E);padding:20px 20px 18px;position:relative;overflow:hidden;">'
-    +'<div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05);"></div>'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;">'
-    +'<div style="display:flex;align-items:center;gap:14px;"><img src="'+LOGO+'" onerror="this.style.display=\'none\'" style="width:60px;height:60px;border-radius:14px;background:rgba(255,255,255,.15);padding:4px;object-fit:contain;"><div><div style="font-family:Nunito,sans-serif;font-size:26px;font-weight:900;color:#fff;letter-spacing:.06em;line-height:1;">ТОЛК</div><div style="font-size:12px;color:rgba(255,255,255,.65);font-style:italic;margin-top:3px;">Питайся с толком!</div></div></div>'
-    +'<div style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:10px 16px;text-align:right;"><div style="font-family:Nunito,sans-serif;font-size:22px;font-weight:800;color:#fff;line-height:1;">'+today.getDate()+'</div><div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px;">'+today.toLocaleDateString('ru-RU',{month:'long',year:'numeric'})+'</div></div>'
-    +'</div>'
-    +'<div style="display:flex;align-items:center;gap:20px;">'
-    +'<div style="flex-shrink:0;"><div style="font-family:Nunito,sans-serif;font-size:44px;font-weight:900;color:#fff;line-height:1;">'+Math.round(todayTot.kcal)+'</div><div style="font-size:11px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;">ккал сегодня</div></div>'
-    +'<div style="flex:1;display:flex;flex-direction:column;gap:7px;">'
-    +'<div style="display:flex;align-items:center;gap:10px;"><div style="font-size:11px;color:rgba(255,255,255,.6);font-weight:600;width:14px;">Б</div><div style="flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.15);overflow:hidden;"><div style="height:100%;width:'+pPct+'%;background:#60A5FA;border-radius:3px;"></div></div><div style="font-size:11px;font-weight:600;color:#fff;width:40px;text-align:right;">'+Math.round(todayTot.p)+'г</div></div>'
-    +'<div style="display:flex;align-items:center;gap:10px;"><div style="font-size:11px;color:rgba(255,255,255,.6);font-weight:600;width:14px;">Ж</div><div style="flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.15);overflow:hidden;"><div style="height:100%;width:'+fPct+'%;background:#FBBF24;border-radius:3px;"></div></div><div style="font-size:11px;font-weight:600;color:#fff;width:40px;text-align:right;">'+Math.round(todayTot.f)+'г</div></div>'
-    +'<div style="display:flex;align-items:center;gap:10px;"><div style="font-size:11px;color:rgba(255,255,255,.6);font-weight:600;width:14px;">У</div><div style="flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.15);overflow:hidden;"><div style="height:100%;width:'+cPct+'%;background:#FF6B6B;border-radius:3px;"></div></div><div style="font-size:11px;font-weight:600;color:#fff;width:40px;text-align:right;">'+Math.round(todayTot.c)+'г</div></div>'
-    +'<div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:2px;">Норма: '+lim.kcal+' ккал · выполнено '+pct+'%</div>'
-    +'</div></div></div>'
-    // cards — weekly average
-    +'<div style="padding:18px 16px;">'
-    +'<div style="font-size:10px;color:#9CA3AF;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">Среднее в день за неделю</div>'
-    +'<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:20px;">'
-    +[['Калории',avg.kcal,'ккал','норма '+lim.kcal,'#2D9E6B'],['Белки',avg.p,'г','норма '+lim.p+'г','#60A5FA'],['Жиры',avg.f,'г','норма '+lim.f+'г','#FBBF24'],['Углеводы',avg.c,'г','норма '+lim.c+'г','#FF6B6B']]
-      .map(([l,v,u,n,c])=>{
-        const pctAvg = l==='Калории'?(lim.kcal>0?Math.round(v/lim.kcal*100):0):(lim.p>0?Math.round(v/(l==='Белки'?lim.p:l==='Жиры'?lim.f:lim.c)*100):0);
-        const barColor = pctAvg>110?'#FF6B6B':c;
-        return '<div style="background:#F7F9FC;border-radius:14px;padding:12px 14px;border:1px solid #E5E7EB;">'
-          +'<div style="font-size:10px;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">'+l+'</div>'
-          +'<div style="font-family:Nunito,sans-serif;font-size:20px;font-weight:800;color:'+c+';line-height:1;">'+v+' <span style="font-size:11px;font-weight:400;color:#9CA3AF;">'+u+'</span></div>'
-          +'<div style="margin-top:6px;height:4px;background:#E5E7EB;border-radius:2px;overflow:hidden;"><div style="height:100%;width:'+Math.min(pctAvg,100)+'%;background:'+barColor+';border-radius:2px;"></div></div>'
-          +'<div style="font-size:10px;color:#9CA3AF;margin-top:4px;">'+n+' · '+pctAvg+'%</div>'
-          +'</div>';
-      }).join('')
-    +'</div>'
-    // meals
-    +'<div style="margin-bottom:26px;"><div style="font-family:Nunito,sans-serif;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6B7280;margin-bottom:12px;">ПРИЁМЫ ПИЩИ</div>'
-    +'<table style="width:100%;border-collapse:collapse;"><thead><tr>'
-    +'<th style="text-align:left;font-size:10px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;padding:0 0 10px;border-bottom:1px solid #E5E7EB;">Состав</th>'
-    +'<th style="text-align:right;font-size:10px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;padding:0 0 10px;border-bottom:1px solid #E5E7EB;">День · Время</th>'
-    +'<th style="text-align:right;font-size:10px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;padding:0 0 10px;border-bottom:1px solid #E5E7EB;">Б/Ж/У</th>'
-    +'<th style="text-align:right;font-size:10px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;padding:0 0 10px;border-bottom:1px solid #E5E7EB;">Ккал</th>'
-    +'</tr></thead><tbody>'+mealRows+'</tbody></table></div>'
-    // chart
-    +'<div style="margin-bottom:26px;"><div style="font-family:Nunito,sans-serif;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6B7280;margin-bottom:12px;">КАЛОРИИ ЗА НЕДЕЛЮ</div>'
-    +'<div style="background:#F7F9FC;border-radius:16px;padding:16px;border:1px solid #E5E7EB;">'
-    +'<div style="display:flex;align-items:flex-end;gap:5px;height:80px;border-bottom:1px solid #E5E7EB;margin-bottom:4px;">'+chartBars+'</div>'
-    +'<div style="display:flex;gap:5px;margin-bottom:10px;">'+chartLabels+'</div>'
-    +'<div style="height:1px;background:repeating-linear-gradient(90deg,#2D9E6B 0,#2D9E6B 4px,transparent 4px,transparent 8px);margin-bottom:8px;opacity:.4;"></div>'
-    +'<div style="display:flex;gap:14px;justify-content:flex-end;">'
-    +'<div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#6B7280;"><div style="width:8px;height:8px;border-radius:2px;background:#2D9E6B;"></div>В норме</div>'
-    +'<div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#6B7280;"><div style="width:8px;height:8px;border-radius:2px;background:#FF6B6B;"></div>Превышение</div>'
-    +'<div style="font-size:10px;color:#6B7280;">— — Норма '+lim.kcal+' ккал</div>'
-    +'</div></div></div>'
-    // top-10
-    +'<div style="margin-bottom:26px;"><div style="font-family:Nunito,sans-serif;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6B7280;margin-bottom:4px;">ТОП-10 ПРОДУКТОВ И БЛЮД</div>'
-    +'<div style="font-size:10px;color:#9CA3AF;margin-bottom:12px;">за последние 30 дней</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">'
-    +'<div style="background:#F7F9FC;border-radius:14px;padding:14px;border:1px solid #E5E7EB;"><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em;">Продукты</div>'+(prods.slice(0,10).length?prods.slice(0,10).map((it,i)=>ti(it,i)).join(''):emp)+'</div>'
-    +'<div style="background:#F7F9FC;border-radius:14px;padding:14px;border:1px solid #E5E7EB;"><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em;">Блюда</div>'+(dishs.slice(0,10).length?dishs.slice(0,10).map((it,i)=>ti(it,i)).join(''):emp)+'</div>'
-    +'</div></div>'
-    // top-10 drinks
-    +'<div style="margin-bottom:26px;"><div style="font-family:Nunito,sans-serif;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6B7280;margin-bottom:4px;">ТОП-10 НАПИТКОВ</div>'
-    +'<div style="font-size:10px;color:#9CA3AF;margin-bottom:12px;">за последние 30 дней</div>'
-    +'<div style="background:#F7F9FC;border-radius:14px;padding:14px;border:1px solid #E5E7EB;">'
-    +(drinks.slice(0,10).length?drinks.slice(0,10).map((it,i)=>{
-      const colors=['#2D9E6B','#60A5FA','#FBBF24','#FF6B6B','#A78BFA','#34D399','#F87171','#93C5FD','#FCD34D','#6B7280'];
-      const c=colors[i]||'#6B7280';
-      return '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #E5E7EB;">'
-        +'<div style="font-family:Nunito,sans-serif;font-size:13px;font-weight:800;width:22px;color:'+c+';flex-shrink:0;">'+(i+1)+'</div>'
-        +'<div style="font-size:20px;flex-shrink:0;">🥤</div>'
-        +'<div style="flex:1;font-size:12px;color:#1F2937;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+it.name.charAt(0).toUpperCase()+it.name.slice(1)+'</div>'
-        +'<div style="font-size:11px;color:#9CA3AF;flex-shrink:0;">'+it.cnt+'×</div>'
-        +'</div>';
-    }).join(''):emp)
-    +'</div></div>'
-    +'</div>'
-    // footer
-    +'<div style="padding:14px 16px;border-top:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:center;">'
-    +'<div style="display:flex;align-items:center;gap:10px;"><img src="'+LOGO+'" onerror="this.style.display=\'none\'" style="width:32px;height:32px;border-radius:8px;object-fit:contain;"><div><div style="font-family:Nunito,sans-serif;font-weight:900;font-size:14px;color:#2D9E6B;">ТОЛК</div><div style="font-size:10px;color:#9CA3AF;font-style:italic;">Питайся с толком!</div></div></div>'
-    +'<div style="font-size:11px;color:#9CA3AF;">Сформировано '+todayLabel+'</div>'
-    +'</div>'
-    +'</div></body></html>';
+  // ═══ ШАПКА ═══
+  const headerHtml = `
+    <div class="report-header">
+      <div class="header-top">
+        <div class="brand">ТОЛК</div>
+        <div class="header-date">${today.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})}</div>
+      </div>
+      ${userName ? `<div class="header-name">${userName}</div>` : ''}
+      <div class="header-period">${periodLabel}</div>
+    </div>`;
 
-  const w = window.open('', '_blank');
-  if (w) {
-    w.document.write(html);
-    w.document.close();
+  // ═══ СРЕДНЕЕ ═══
+  const avgLabel = period==='today' ? 'ИТОГО ЗА ДЕНЬ' : 'СРЕДНЕЕ В ДЕНЬ ЗА ПЕРИОД';
+  const avgHtml = `
+    <div class="section">
+      <div class="sec-title">${avgLabel}</div>
+      <div class="kcal-big">
+        <span class="kcal-num" style="color:${pctColor(pctOf(avg.kcal,lim.kcal))}">${avg.kcal}</span>
+        <span class="kcal-unit">ккал</span>
+        <span class="kcal-pct" style="color:${pctColor(pctOf(avg.kcal,lim.kcal))};background:${pctBg(pctOf(avg.kcal,lim.kcal))}">${pctOf(avg.kcal,lim.kcal)}% нормы</span>
+      </div>
+      <div class="stats-row">
+        ${statCell('Белки',avg.p,'г',lim.p,'#60A5FA')}
+        ${statCell('Жиры',avg.f,'г',lim.f,'#FBBF24')}
+        ${statCell('Углеводы',avg.c,'г',lim.c,'#FF6B6B')}
+        ${statCell('Вода',Math.round(avg.water/100)/10,'л',waterNormDay/1000,'#60A5FA')}
+      </div>
+      <div class="norm-hint">Норма: ${lim.kcal} ккал · Б ${lim.p}г · Ж ${lim.f}г · У ${lim.c}г · Вода ${Math.round(waterNormDay/100)/10}л</div>
+    </div>`;
+
+  // ═══ САММАРИ ═══
+  const summaryHtml = summary ? `
+    <div class="section">
+      <div class="sec-title">АНАЛИЗ ПЕРИОДА</div>
+      <div class="summary-box">${summary.replace(/\n/g,'<br>')}</div>
+    </div>` : '';
+
+  // ═══ ТАБЛИЦА ПРИЁМОВ (сегодня/неделя) ═══
+  let mealsHtml = '';
+  if (period !== 'month') {
+    const rows = dayData.flatMap(({ds,meals})=>{
+      if(!meals.length) return [];
+      const dayLabel = period==='week' ? `<tr class="day-header-row"><td colspan="5">${new Date(ds+'T12:00:00').toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'})}</td></tr>` : '';
+      const mealRows = meals.map(m=>{
+        const mt=m.items.reduce((s,i)=>({kcal:s.kcal+i.kcal,p:s.p+i.p,f:s.f+i.f,c:s.c+i.c}),{kcal:0,p:0,f:0,c:0});
+        const names=m.items.map(i=>(i.name||'').charAt(0).toUpperCase()+(i.name||'').slice(1)+(i.weight?' '+Math.round(i.weight)+'г':'')).join(', ');
+        const wml=m.items.filter(i=>{const nm=(i.name||'').toLowerCase();return['вода','чай','кофе','сок','молоко','кефир','компот','капучино','латте','газировка','минералка','напиток','морс','смузи'].some(k=>nm.includes(k));}).reduce((s,i)=>s+(i.weight||0),0);
+        return `<tr><td class="meal-name">${names}</td><td class="tc">${m.time||'—'}</td><td class="tc muted">${Math.round(mt.p)}/${Math.round(mt.f)}/${Math.round(mt.c)}</td><td class="tc green fw">${Math.round(mt.kcal)}</td><td class="tc blue">${wml>0?wml+'мл':'—'}</td></tr>`;
+      }).join('');
+      return [dayLabel+mealRows];
+    }).join('');
+    mealsHtml = `
+      <div class="section">
+        <div class="sec-title">ПРИЁМЫ ПИЩИ</div>
+        <table class="data-table">
+          <thead><tr><th>Состав</th><th class="tc">Время</th><th class="tc">Б/Ж/У</th><th class="tc">Ккал</th><th class="tc">Вода</th></tr></thead>
+          <tbody>${rows||'<tr><td colspan="5" class="empty">Записей нет</td></tr>'}</tbody>
+        </table>
+      </div>`;
   } else {
-    const blob = new Blob([html], {type:'text/html'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.target = '_blank'; document.body.appendChild(a); a.click();
+    // ═══ ТАБЛИЦА ПО ДНЯМ (месяц) ═══
+    const dayRows = dayData.filter(d=>d.hasMeals).map(d=>{
+      const pKcal=pctOf(d.kcal,lim.kcal), pP=pctOf(d.p,lim.p), pF=pctOf(d.f,lim.f), pC=pctOf(d.c,lim.c), pW=pctOf(d.water,waterNormDay);
+      const cc=(p)=>`style="color:${pctColor(p)};font-weight:${p>110||p<70?'700':'400'}"`;
+      const dLabel=new Date(d.ds+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'short',weekday:'short'});
+      return `<tr>
+        <td>${dLabel}</td>
+        <td class="tc" ${cc(pKcal)}>${Math.round(d.kcal)}</td>
+        <td class="tc" ${cc(pKcal)}>${pKcal}%</td>
+        <td class="tc" ${cc(pP)}>${Math.round(d.p)}</td>
+        <td class="tc" ${cc(pF)}>${Math.round(d.f)}</td>
+        <td class="tc" ${cc(pC)}>${Math.round(d.c)}</td>
+        <td class="tc" ${cc(pW)}>${d.water>0?Math.round(d.water/100)/10+'л':'—'}</td>
+      </tr>`;
+    }).join('');
+    mealsHtml = `
+      <div class="section">
+        <div class="sec-title">ИТОГИ ПО ДНЯМ</div>
+        <div class="legend-row"><span class="leg-red">■ >110% нормы</span><span class="leg-yellow">■ <70% нормы</span><span class="leg-green">■ норма</span></div>
+        <table class="data-table">
+          <thead><tr><th>Дата</th><th class="tc">Ккал</th><th class="tc">%</th><th class="tc">Б г</th><th class="tc">Ж г</th><th class="tc">У г</th><th class="tc">Вода</th></tr></thead>
+          <tbody>${dayRows||'<tr><td colspan="7" class="empty">Записей нет</td></tr>'}</tbody>
+        </table>
+      </div>`;
+  }
+
+  // ═══ ГРАФИК ═══
+  let chartHtml = '';
+  if (period !== 'today') {
+    const chartDays = period==='week' ? dayData : (() => {
+      const weeks=[];
+      for(let i=0;i<dayData.length;i+=7){
+        const chunk=dayData.slice(i,i+7);
+        weeks.push({ds:chunk[0].ds,kcal:chunk.reduce((s,d)=>s+d.kcal,0),label:'Нед.'+(Math.floor(i/7)+1),hasMeals:chunk.some(d=>d.hasMeals)});
+      }
+      return weeks;
+    })();
+    const maxK=Math.max(...chartDays.map(d=>d.kcal),lim.kcal||1,1);
+    const normPct=lim.kcal>0?Math.round(lim.kcal/maxK*100):0;
+    const bars=chartDays.map(d=>{
+      const h=d.kcal===0?0:Math.max(3,Math.round(d.kcal/maxK*100));
+      const over=lim.kcal>0&&d.kcal>lim.kcal*1.05;
+      const lbl=period==='week'?new Date(d.ds+'T12:00:00').toLocaleDateString('ru-RU',{weekday:'short'}):(d.label||'');
+      const color=!d.hasMeals?'#E5E7EB':over?'#EF4444':'#2D9E6B';
+      return `<div class="bar-wrap"><div class="bar" style="height:${h}%;background:${color}"></div><div class="bar-lbl">${lbl}</div></div>`;
+    }).join('');
+    chartHtml=`
+      <div class="section">
+        <div class="sec-title">КАЛОРИИ ЗА ПЕРИОД</div>
+        <div class="chart-area">
+          <div class="chart-bars">${bars}</div>
+          ${lim.kcal>0?`<div class="norm-line" style="bottom:calc(${normPct}% + 20px)"><span>норма ${lim.kcal}</span></div>`:''}
+        </div>
+        <div class="chart-legend"><span style="color:#2D9E6B">■ норма</span> <span style="color:#EF4444">■ превышение</span> <span style="color:#9CA3AF">■ нет данных</span></div>
+      </div>`;
+  }
+
+  // ═══ ТОПЫ ═══
+  let topsHtml = '';
+  if (period !== 'today') {
+    const topRow=(list)=>list.length?list.map((it,i)=>`<div class="top-row"><span class="top-num">${i+1}</span><span class="top-name">${it[0].charAt(0).toUpperCase()+it[0].slice(1)}</span><span class="top-cnt">${it[1]}×</span></div>`).join(''):'<div class="empty">Нет данных</div>';
+    topsHtml=`
+      <div class="section">
+        <div class="sec-title">ТОП ПРОДУКТОВ И БЛЮД <span class="sec-sub">за период</span></div>
+        <div class="tops-grid">
+          <div class="top-col"><div class="top-col-title">Продукты</div>${topRow(topProds)}</div>
+          <div class="top-col"><div class="top-col-title">Блюда</div>${topRow(topDishs)}</div>
+        </div>
+      </div>
+      ${topDrinks.length?`<div class="section"><div class="sec-title">ТОП НАПИТКОВ</div><div class="top-col">${topRow(topDrinks)}</div></div>`:''}`;
+  }
+
+  // ═══ CSS ═══
+  const css = `
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',system-ui,sans-serif;background:#F7F9FC;color:#1F2937;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .page{max-width:420px;margin:0 auto;background:#fff;}
+    .report-header{background:linear-gradient(135deg,#2D9E6B,#1A7A4E);color:#fff;padding:20px 18px 18px;}
+    .header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+    .brand{font-family:'Nunito',sans-serif;font-size:18px;font-weight:900;letter-spacing:.1em;}
+    .header-date{font-size:11px;color:rgba(255,255,255,.7);}
+    .header-name{font-size:16px;font-weight:700;margin-bottom:3px;}
+    .header-period{font-size:12px;color:rgba(255,255,255,.75);}
+    .section{padding:16px 18px;border-bottom:1px solid #F3F4F6;}
+    .sec-title{font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#9CA3AF;margin-bottom:12px;}
+    .sec-sub{font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;}
+    .kcal-big{display:flex;align-items:baseline;gap:6px;margin-bottom:12px;}
+    .kcal-num{font-family:'Nunito',sans-serif;font-size:36px;font-weight:900;line-height:1;}
+    .kcal-unit{font-size:13px;color:#9CA3AF;}
+    .kcal-pct{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:4px;}
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;}
+    .stat-cell{background:#F9FAFB;border-radius:10px;padding:8px 10px;border:1px solid #F3F4F6;}
+    .stat-lbl{font-size:9px;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
+    .stat-val{font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;line-height:1;}
+    .stat-unit{font-size:9px;font-weight:400;color:#9CA3AF;margin-left:1px;}
+    .stat-pct{font-size:9px;font-weight:700;margin-top:4px;display:inline-block;padding:1px 5px;border-radius:8px;}
+    .norm-hint{font-size:10px;color:#9CA3AF;}
+    .summary-box{font-size:12px;line-height:1.7;color:#374151;background:#F9FAFB;border-radius:10px;padding:12px 14px;border-left:3px solid #2D9E6B;}
+    .data-table{width:100%;border-collapse:collapse;font-size:11px;}
+    .data-table th{font-size:9px;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em;padding:0 0 8px;border-bottom:1.5px solid #E5E7EB;}
+    .data-table td{padding:7px 0;border-bottom:1px solid #F3F4F6;vertical-align:top;}
+    .day-header-row td{font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;color:#2D9E6B;padding:10px 0 4px;text-transform:capitalize;}
+    .meal-name{font-size:11px;color:#1F2937;max-width:160px;}
+    .tc{text-align:right;}
+    .muted{color:#9CA3AF;}
+    .green{color:#2D9E6B;}
+    .blue{color:#60A5FA;}
+    .fw{font-weight:700;}
+    .empty{text-align:center;color:#9CA3AF;padding:16px 0;font-size:12px;}
+    .legend-row{font-size:10px;margin-bottom:10px;display:flex;gap:12px;}
+    .leg-red{color:#EF4444;} .leg-yellow{color:#F59E0B;} .leg-green{color:#2D9E6B;}
+    .chart-area{position:relative;height:90px;margin-bottom:6px;}
+    .chart-bars{display:flex;align-items:flex-end;gap:3px;height:70px;border-bottom:1px solid #E5E7EB;}
+    .bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
+    .bar{width:100%;border-radius:3px 3px 0 0;min-height:2px;transition:height .3s;}
+    .bar-lbl{font-size:8px;color:#9CA3AF;margin-top:3px;text-align:center;}
+    .norm-line{position:absolute;left:0;right:0;border-top:1.5px dashed #2D9E6B;font-size:8px;color:#2D9E6B;text-align:right;padding-right:4px;}
+    .chart-legend{font-size:9px;display:flex;gap:10px;justify-content:flex-end;color:#6B7280;}
+    .tops-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .top-col{} .top-col-title{font-size:10px;font-weight:600;color:#6B7280;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;}
+    .top-row{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #F3F4F6;font-size:11px;}
+    .top-num{font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:#D1D5DB;width:16px;flex-shrink:0;}
+    .top-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .top-cnt{font-size:10px;color:#9CA3AF;flex-shrink:0;}
+    .footer{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;background:#F9FAFB;}
+    .footer-brand{font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#2D9E6B;}
+    .footer-sub{font-size:9px;color:#9CA3AF;font-style:italic;}
+    .footer-date{font-size:10px;color:#9CA3AF;}
+    .print-btn{display:block;text-align:center;padding:12px;background:#2D9E6B;color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border:none;width:100%;letter-spacing:.04em;}
+    @media print{.print-btn{display:none!important;} body{background:#fff;} .page{max-width:100%;}}
+  `;
+
+  const html = `<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ТОЛК — Отчёт</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>${css}</style></head><body>
+  <div class="page">
+    <button class="print-btn" onclick="window.print()">🖨 Распечатать / Сохранить PDF</button>
+    ${headerHtml}
+    ${avgHtml}
+    ${summaryHtml}
+    ${mealsHtml}
+    ${chartHtml}
+    ${topsHtml}
+    <div class="footer">
+      <div><div class="footer-brand">ТОЛК</div><div class="footer-sub">Питайся с толком!</div></div>
+      <div class="footer-date">Сформировано ${today.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})}</div>
+    </div>
+  </div>
+  </body></html>`;
+
+  const w = window.open('','_blank');
+  if (w) { w.document.write(html); w.document.close(); }
+  else {
+    const blob=new Blob([html],{type:'text/html'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='tolk-report.html'; document.body.appendChild(a); a.click();
     setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},3000);
   }
-  showToast('Отчёт открыт — нажми «Поделиться → Печать» для PDF');
+  showToast('Отчёт открыт — нажми кнопку вверху для PDF');
 }
 
 
